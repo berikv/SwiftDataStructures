@@ -25,18 +25,14 @@ struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLitera
     
     var first: Element? {
         if let key = keys.first {
-            if let value = values.first {
-                return (key, value)
-            }
+            return (key, _storage[key]!)
         }
         return nil
     }
     
     var last: Element? {
         if let key = keys.last {
-            if let value = values.last {
-                return (key, value)
-            }
+            return (key, _storage[key]!)
         }
         return nil
     }
@@ -59,12 +55,9 @@ struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLitera
     
     func generate() -> GeneratorOf<Element> {
         var keysGenerator = keys.generate()
-        var valuesGenerator = values.generate()
         return GeneratorOf {
             if let key = keysGenerator.next() {
-                if let value = valuesGenerator.next() {
-                    return (key, value)
-                }
+                return (key, self._storage[key]!)
             }
             return nil
         }
@@ -199,7 +192,7 @@ extension OrderedDictionary: Printable, DebugPrintable {
 }
 
 func ==<Key: Equatable, Value: Equatable>(lhs: OrderedDictionary<Key, Value>, rhs: OrderedDictionary<Key, Value>) -> Bool {
-    return lhs.keys == rhs.keys && lhs.values == rhs.values
+    return lhs.keys == rhs.keys && lhs._storage == rhs._storage
 }
 
 func +=<Key, Value>(inout lhs: OrderedDictionary<Key, Value>, rhs: OrderedDictionary<Key, Value>) {
